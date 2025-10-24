@@ -1,0 +1,279 @@
+MODULO IV: Administracion de Servicios de Red Avanzados
+
+==============================================================================================================================================
+
+Práctica 1: Servidor HTTP Apache2 
+
+==============================================================================================================================================
+
+-Instalación y configuración básica de Apache2-
+
+sudo apt update
+(Para actualizar la lista de paquetes)
+
+sudo apt install apache2 -y
+(Para instalar el servidor web Apache2)
+
+sudo systemctl status apache2
+(Para comprobar que el servicio esté corriendo)
+
+-Crear Sitio 1 (Hola Mundo - Puerto 80)-
+
+sudo mkdir -p /var/www/holamundo.com
+(Para crear el directorio para el primer sitio web)
+
+sudo nano /var/www/holamundo.com/index.html
+(Para crear el archivo HTML. Escribir dentro: 
+Website Hola mundo
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hola mundo</title>
+    </head>
+    <body>
+Hola mundo
+    </body>
+</html> y guardar)
+
+sudo nano /etc/apache2/sites-available/holamundo.conf
+(Para crear el archivo de configuración del host virtual)
+
+Tambien podemos hacerlo de la siguiente manera: 
+sudo nano /etc/apache2/sites-available/
+sudo cp 000-default.conf holamundo.conf
+
+sudo nano holamundo.conf
+(Pegar dentro del archivo .conf lo siguiente y guardar:
+<VirtualHost *:80>
+    DocumentRoot /var/www/holammundo.com/
+    ErrorLog ${APACHE_LOG_DIR}/hola_mundo_error.log
+    CustomLog ${APACHE_LOG_DIR}/hola_mundo_access.log combined
+</VirtualHost>
+)
+
+sudo a2ensite holamundo.conf
+(Para habilitar el nuevo sitio)
+
+sudo a2dissite 000-default.conf
+(Para deshabilitar el sitio por defecto que también usa el puerto 80)
+
+-Crear Sitio 2 (Datos Personales - Puerto 8080)-
+
+sudo mkdir -p /var/www/datos.com
+(Para crear el directorio para el segundo sitio web)
+
+sudo nano /var/www/datos.com/index.html
+(Crear el HTML. Escribir:
+Website Con mis datos
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>título de la página<title>
+    </head>
+    <body>
+        <p>Nombre</p>
+        <p>Matricula</p>
+        <p>asignatura</p>
+    </body>
+</html>
+y guardar)
+
+sudo nano /etc/apache2/sites-available/datos.conf
+(Para crear el archivo de configuración del segundo host virtual)
+
+Tambien podemos hacerlo de la siguiente manera: 
+sudo nano /etc/apache2/sites-available/
+sudo cp holamundo.conf datos.conf
+
+(Pegar dentro del archivo .conf lo siguiente y guardar:
+<VirtualHost *:8080>
+    DocumentRoot /var/www/datos.com/
+    ErrorLog ${APACHE_LOG_DIR}/datos_error.log
+    CustomLog ${APACHE_LOG_DIR}/datos_access.log combined
+</VirtualHost>
+)
+
+sudo nano /etc/apache2/ports.conf
+(Para editar el archivo de puertos de Apache)
+
+(Añadir una nueva línea que diga:
+Listen 8080
+y guardar el archivo)
+
+sudo a2ensite datos.conf
+(Para habilitar el segundo sitio)
+
+sudo systemctl reload apache2
+(Para aplicar todos los cambios reiniciando Apache)
+
+-Verificación-
+(Acceder desde un navegador a http://10.0.0.12 para ver "Hola Mundo" y a http://10.0.0.12:8080 para ver los datos personales)
+
+==============================================================================================================================================
+
+Práctica 2: Servidor de Correo Postfix (SMTP) 
+
+==============================================================================================================================================
+
+-Instalación de Postfix y Mailutils-
+
+sudo apt install postfix -y
+(Para instalar el servidor SMTP Postfix)
+
+sudo dpkg-reconfigure postfix
+(Para configurar Postfix. Seleccionar 'Internet Site' y configurar el 'System mail name' pondremos Ubuntu, 
+luego pondremos el usuario que enviara los correos que es jose20250755 y lo siguiente lo dejaremos exactamente como esta)
+
+sudo apt install mailutils -y
+(Para instalar las utilidades de correo necesarias para enviar)
+
+-Configuración de Postfix para relay (usando Gmail)-
+
+sudo nano /etc/postfix/sasl/sasl_passwd
+(Para crear el archivo de contraseñas de autenticación)
+
+(Añadir la siguiente línea, reemplazando con el correo y una clave de aplicación de Google:)
+[smtp.gmail.com]:587 josegarciainfo41@gmail.com:clave de aplicacion
+
+sudo postmap /etc/postfix/sasl/sasl_passwd
+(Para crear el archivo .db hasheado que Postfix leerá)
+
+sudo chmod 600 /etc/postfix/sasl/sasl_passwd
+(Para asegurar los permisos del archivo de contraseñas)
+
+sudo chmod 600 /etc/postfix/sasl/sasl_passwd.db
+(Para asegurar los permisos del archivo .db)
+
+-Editar configuración principal de Postfix-
+
+sudo nano /etc/postfix/main.cf
+(Para editar el archivo de configuración principal)
+
+relayhost = [smtp.gmail.com]:587 (esta linea no se añade al final , se edita mas arriba)
+
+(Añadir las siguientes líneas al final del archivo:)
+
+smtp_sasl_auth_enable = yes
+smtp_sasl_security_options = noanonymous
+smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd
+smtp_tls_security_level = encrypt
+smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+
+-Reiniciar y Habilitar Postfix-
+
+sudo systemctl restart postfix
+(Para aplicar los cambios de configuración)
+
+sudo systemctl enable postfix
+(Para que el servicio inicie automáticamente con el sistema)
+
+sudo systemctl start postfix
+(Para asegurar que el servicio esté corriendo)
+
+-Enviar correo de prueba-
+
+echo "Jose Miguel García Báez - 20250755" | mail -s "MambruSeFueALaGuerra" os3conadrian@gmail.com
+(Envía el correo con el cuerpo [Jose Miguel Garcia Baez 2025-0755+ y el asunto [MambruSeFueALaGuerra] al maestro)
+
+-Verificar el envío-
+
+sudo tail -n 30 /var/log/mail.log
+(Para monitorear el registro de correo y verificar si el envío fue exitoso (status=sent))
+
+Tambien podemos verificar nuestra bandeja de entrada para confirmar si se envio correctamente
+
+==============================================================================================================================================
+
+Práctica 3: Servidor de Impresión CUPS
+==============================================================================================================================================
+
+-Instalación de CUPS y PDF Virtual-
+
+sudo apt install cups -y
+(Para instalar el "Common UNIX Printing System")
+
+sudo apt install cups-pdf
+(Para instalar el backend que permite a CUPS "imprimir" a un archivo PDF)
+
+-Configurar CUPS para acceso en red-
+
+sudo systemctl enable cups
+(Para que el servicio CUPS inicie automáticamente)
+
+sudo systemctl start cups
+(Para iniciar el servicio CUPS en caso de ser necesario)
+
+Cupsctl --remote-admin --remote-any --share-printers
+(Comando para permitir la administración remota y compartir impresoras)
+
+sudo ufw allow 631/tcp
+(Para permitir el tráfico al puerto 631 de CUPS en el firewall)
+
+sudo ufw reload
+(Para recargar las reglas del firewall)
+
+-Crear usuario administrador de CUPS-
+
+sudo useradd -g lpadmin cupsadmin
+(Crea un nuevo usuario 'cupsadmin' y lo añade al grupo 'lpadmin')
+
+sudo passwd cupsadmin
+(Para asignar una contraseña al nuevo usuario)
+
+-Añadir la impresora PDF desde la interfaz web-
+
+ifconfig
+(Para ver la IP del servidor Ubuntu. Se usará para acceder a la web de CUPS)
+
+(Abrir un navegador en el cliente e ir a: http://10.0.0.10:631)
+
+Ir a 'Administración' y luego 'Añadir impresora'
+(Ingresar las credenciales del usuario en el grupo lpadmin, ej: 'cupsadmin' y su contraseña)
+
+Seleccionar 'CUPS-PDF (Virtual PDF Printer)' y continuar
+
+Configurar el nombre (jose20250755) y activar 'Compartir esta impresora'
+
+Seleccionar la marca 'Generic'
+
+Seleccionar el modelo 'Generic CUPS-PDF Printer (en) (usualmente la segunda opción)
+
+-Instalar la impresora en el cliente (Windows)-
+
+En la interfaz web de CUPS, ir a 'Impresoras'
+
+Hacer clic en la impresora creada y copiar su URL
+
+En Windows, ir a 'Configuración' > 'Bluetooth y dispositivos' > 'Impresoras y escáneres'
+
+Hacer clic en 'Agregar una impresora o escáner' y seleccionar 'Agregar manualmente'
+
+Elegir 'Seleccionar una impresora compartida por nombre'
+
+Pegar la URL copiada (ej. https://10.0.0.10:631/printers/ImpresoraVirtualPDF)
+
+Eliminar la 's' de 'https' para que quede 'http://...'
+
+Dar clic en 'Siguiente', elegir el controlador 'Generic' y aceptar
+
+-Realizar prueba de impresión-
+
+Hacer clic en 'Imprimir una página de prueba' desde Windows
+
+En el servidor Ubuntu, ir a la pestaña 'Trabajos' (Jobs) en la interfaz web de CUPS
+
+(Se debe ver el trabajo listado como completado)
+
+(El archivo PDF impreso se guardará en el servidor, usualmente en /var/spool/cups-pdf/ANONYMOUS/)
+
+Por ultimo , en nuestro cliente abriremos el word que querramos imprimir
+
+Clickear File , para salir del archivo y luego buscaremos la opcion de print
+
+En print , seleccionaremos la impresora que acabos de crear (jose20250755)
+
+Clickeamos imprimir , y en teoria se deberia reflejar la impreson en la pestaña 'Jobs' de nuestro servidor de cups
+
+Jose Miguel García Báez - 20250755
