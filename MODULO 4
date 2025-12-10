@@ -277,3 +277,146 @@ En print , seleccionaremos la impresora que acabos de crear (jose20250755)
 Clickeamos imprimir , y en teoria se deberia reflejar la impreson en la pestaña 'Jobs' de nuestro servidor de cups
 
 Jose Miguel García Báez - 20250755
+
+
+
+Sudo apt update
+Sudo apt install apache2
+Sudo ufw app list (para verificar los servicios instalados)
+Sudo ufw allow apache
+Sudo ufw status
+Cd /var/www/html
+Nano index.html (para editar el archivo de la pagina web)
+Sudo systemctl status apache2 (para verificar si el servidor esta
+activado)
+Sudo systemctl stop apache2 (en caso de querer apagarlo)
+Sudo systemctl start apache2 (en caso de querer encenderlo)
+Instalacion Nginx
+Sudo apt update
+Sudo apt install nginx
+Sudo ufw app list
+Sudo ufw allow ´Nginx HTTP´
+Sudo ufw status (para verificar si se instalo)
+Sudo systemctl stop apache2 (para apagar el servidor apache y así
+verificamos que ya se detuvo la pagina web)
+Sudo systemctl start nginx (para activar el servidor nginx y así
+verificamos que ya sigue funcionando la pagina web)
+4.2 Administracion y configuración de WordPress
+sudo apt install php libapache2-mod-php php-mysql php-curl php-gd
+php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip (con este
+comando instalaremos todas las extensiones necesarias de php)
+sudo mysql -u root (para acceder a nuestra base de datos)
+CREATE DATABASE wordpress_jg; (para crear nuestra base de datos)
+CREATE USER ´josegarcia´@’localhost’ IDENTIFIED BY
+‘pressgarcia’; (para crear un usuario y designer su contraseña)
+GRANT ALL PRIVILEGES ON wordpress_jg.* TO
+‘josegarcia@localhost’; (para darle todo los permisos a el usuario)
+FLUSH PRIVILEGES; (para aplicar los cambios a la base de dato)
+Exit para salir de mysql
+Cd /var/www/html/
+sudo wget https://wordpress.org/latest.tar.gz (para instalar el wordpress)
+sudo tar -xzvf latest.tar.gz (para descomprimir el archivo que acabos de
+descargar)
+sudo chown -R www-data:www-data wordpress/
+sudo chmod -R 755 wordpress/ (estos dos comandos son para asignarle
+los permisos a wordpress)
+Luego entrar al servidor local , localhost/wordpress/
+EN CASO DE NECESITAR LA VERSION 8.4 DE PHP EJECUTAR LO
+SIGUIENTE :
+Sudo a2dismod php7.4
+Sudo a2enmod php8.4
+Sudo systemctl restart apache2
+4.3 Administración y configuración de Correos
+Sudo nano /etc/hosts : agregar 127.0.0.1 garcia.localhost
+Sudo apt update
+Sudo apt upgrade
+Ifconfig (para ver nuestra ip local y hacer ping desde el cmd)
+Sudo apt-get install apache2 (ya lo tengo instalado)
+Sudo apt install software-properties-common
+Sudo add-apt-repository ppa:ondrej/php
+Sudo apt update
+Sudo apt install php7.4 libapache2-mod-php7.4 php-mysql
+Php -v (para comprobar si se instalo correctamente la versión 7.4de php)
+Sudo apt install postfix
+-vamos a internet site
+-system mail name : garcia.localhost
+Sudo dpkg-reconfigure postfix (en caso de querer arreglar un error)
+Sudo apt install dovecot-imapd dovecot-pop3d
+Sudo service dovecot restart
+Cd /var/www/html/
+sudo wget
+https://sourceforge.net/projects/squirrelmail/files/stable/1.4.22/squirrelm
+ail-webmail-1.4.22.zip (para instalar squirrelmail)
+sudo unzip squirrelmail-webmail-1.4.22.zip (para descomprimir el
+archivo)
+sudo apt install unzip (en caso de no tenerlo instalado)
+sudo mv squirrelmail-webmail-1.4.22 squirrelmail
+damos permisos a la carpeta:
+sudo chown -R www-data:www-data /var/www/html/squirrelmail/
+sudo chmod 755 -R /var/www/html/squirrelmail/
+sudo perl /var/www/html/squirrelmail/config/conf.pl
+-opcion 2 , opción 1 y colocar garcia.localhost
+-R para regresar , opción 4 y colocar lo siguiente en cada opción
+En la opción 1 colocar: /var/www/html/squirrelmail/data
+En la opción 2 colocar: /var/www/html/squirrelmail/attach/
+En la opción 11 colocar: True
+Le damos a S para guardar y Q para salir
+PARA AÑADIR USUARIOS
+Sudo adduser gerencia
+Sudo usermod -m -d /var/www/html/gerencia gerencia
+Sudo mkdir -p /var/www/html/gerencia
+Sudo adduser sistemas
+Sudo usermod -m -d /var/www/html/sistemas sistemas
+Sudo mkdir -p /var/www/html/sistemas
+EN CASO DE NECESITAR LA VERSION 7.4 DE PHP EJECUTAR LO
+SIGUIENTE :
+Sudo a2dismod php8.4
+Sudo a2enmod php7.4
+Sudo systemctl restart apache2
+4.4 Configuración de un servidor de impresión - (hacer practica
+durante la exposicion)
+Sudo apt update
+Sudo apt install cups -y
+Sudo systemctl enable cups
+Sudo systemctl start cups
+Sudo systemctl status cups
+Sudo nano /etc/cups/cupsd.conf :
+Cambia Listen localhost:631 → Port 631
+En las secciones <Location /> y <Location /admin> agrega:
+Order allow,deny
+Allow all
+Sudo systemctl restart cups
+Sudo ufw allow 631/tcp
+Sudo ufw reload
+Acceder al panel web
+http://<ip-servidor>:631
+Añadir impresoras locales o en red.
+Configurar permisos y realizar impresión de prueba.
+Comandos útiles
+lpstat -p -d # Ver impresoras
+lpq # Ver trabajos en cola
+cancel <id> # Cancelar un trabajo
+lp /ruta/archivo.txt # Imprimir archive
+4.5 Configuracion de un servidor Web Proxy y de repositorios (Aptcacher-ng)
+Sudo apt update
+Sudo apt install apt-cacher-ng -y
+Sudo systemctl status apt-cacher-ng
+Debe aparecer active (running)
+Puerto por defecto: 3142
+sudo nano /etc/apt-cacher-ng/acng.conf (para configurarlo , es opcional)
+sudo nano /etc/apt/apt.conf.d/01proxy
+Acquire::http { Proxy "http://<ip-servidor>:3142"; };
+sudo apt update
+sudo apt install vim
+4.6 Configuracion de Rutas Estaticas y Rutas Por Defecto en Linux -
+(hacer practica durante la exposicion)
+Ip route show (para ver las rutas)
+O route -n (para ver als rutas también)
+Sudo ip route add 10.0.0.0/24 via 10.161.174.254 dev enp0s3
+Ip route show
+PARA CONFIGURAR RUTA POR DEFECTO
+Sudo ip route add default via 10.161.174.1 dev enp0s3
+Sudo ip route del default (para eliminar la ruta por defecto)
+COMO HACER LAS RUTAS PERMANENTES
+Sudo nano /etc/netplan/50-cloud-init.yaml (aquí agregaremos la
+siguiente configuración)
