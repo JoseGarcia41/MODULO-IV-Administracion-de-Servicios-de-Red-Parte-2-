@@ -291,6 +291,8 @@ Sudo systemctl status apache2 (para verificar si el servidor esta
 activado)
 Sudo systemctl stop apache2 (en caso de querer apagarlo)
 Sudo systemctl start apache2 (en caso de querer encenderlo)
+
+
 Instalacion Nginx
 Sudo apt update
 Sudo apt install nginx
@@ -301,31 +303,31 @@ Sudo systemctl stop apache2 (para apagar el servidor apache y así
 verificamos que ya se detuvo la pagina web)
 Sudo systemctl start nginx (para activar el servidor nginx y así
 verificamos que ya sigue funcionando la pagina web)
+
+
 4.2 Administracion y configuración de WordPress
-sudo apt install php libapache2-mod-php php-mysql php-curl php-gd
-php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip (con este
+
+sudo apt install php libapache2-mod-php php-mysql php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip (con este
 comando instalaremos todas las extensiones necesarias de php)
 sudo mysql -u root (para acceder a nuestra base de datos)
 CREATE DATABASE wordpress_jg; (para crear nuestra base de datos)
-CREATE USER ´josegarcia´@’localhost’ IDENTIFIED BY
-‘pressgarcia’; (para crear un usuario y designer su contraseña)
-GRANT ALL PRIVILEGES ON wordpress_jg.* TO
-‘josegarcia@localhost’; (para darle todo los permisos a el usuario)
+CREATE USER ´josegarcia´@’localhost’ IDENTIFIED BY ‘pressgarcia’; (para crear un usuario y designer su contraseña)
+GRANT ALL PRIVILEGES ON wordpress_jg.* TO ‘josegarcia@localhost’; (para darle todo los permisos a el usuario)
 FLUSH PRIVILEGES; (para aplicar los cambios a la base de dato)
 Exit para salir de mysql
 Cd /var/www/html/
 sudo wget https://wordpress.org/latest.tar.gz (para instalar el wordpress)
-sudo tar -xzvf latest.tar.gz (para descomprimir el archivo que acabos de
-descargar)
+sudo tar -xzvf latest.tar.gz (para descomprimir el archivo que acabos de descargar)
 sudo chown -R www-data:www-data wordpress/
-sudo chmod -R 755 wordpress/ (estos dos comandos son para asignarle
-los permisos a wordpress)
+sudo chmod -R 755 wordpress/ (estos dos comandos son para asignarle los permisos a wordpress)
 Luego entrar al servidor local , localhost/wordpress/
 EN CASO DE NECESITAR LA VERSION 8.4 DE PHP EJECUTAR LO
 SIGUIENTE :
 Sudo a2dismod php7.4
 Sudo a2enmod php8.4
 Sudo systemctl restart apache2
+
+
 4.3 Administración y configuración de Correos
 Sudo nano /etc/hosts : agregar 127.0.0.1 garcia.localhost
 Sudo apt update
@@ -373,8 +375,9 @@ SIGUIENTE :
 Sudo a2dismod php8.4
 Sudo a2enmod php7.4
 Sudo systemctl restart apache2
-4.4 Configuración de un servidor de impresión - (hacer practica
-durante la exposicion)
+
+
+4.4 Configuración de un servidor de impresión - (hacer practica durante la exposicion)
 Sudo apt update
 Sudo apt install cups -y
 Sudo systemctl enable cups
@@ -397,6 +400,8 @@ lpstat -p -d # Ver impresoras
 lpq # Ver trabajos en cola
 cancel <id> # Cancelar un trabajo
 lp /ruta/archivo.txt # Imprimir archive
+
+
 4.5 Configuracion de un servidor Web Proxy y de repositorios (Aptcacher-ng)
 Sudo apt update
 Sudo apt install apt-cacher-ng -y
